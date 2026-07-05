@@ -41,12 +41,19 @@ public class MovieAverageScoreRepositoryImpl implements MovieAverageScoreCustomR
 
 		Query query = em.createNativeQuery("select avg(score) from movie_score s join movie_rating r on r.id = s.movie_rating_id where r.movie_id = :mId");
 		query.setParameter("mId", id);
-		BigDecimal avgScore = (BigDecimal)query.getSingleResult();
-		avgScore.setScale(2, RoundingMode.CEILING);
+		// avg() type varies by database (DECIMAL on MySQL, DOUBLE on H2); null when no ratings remain
+		Number avgResult = (Number) query.getSingleResult();
+		if (avgResult == null) {
+			if (score != null) {
+				movieAverageScoreRepository.delete(score);
+			}
+			return null;
+		}
+		float avgScore = BigDecimal.valueOf(avgResult.doubleValue()).setScale(2, RoundingMode.CEILING).floatValue();
 		if (score != null) {
-			score.setAverageScore(avgScore.floatValue());
+			score.setAverageScore(avgScore);
 		} else{
-			score = (MovieAverageScore.builder().averageScore(avgScore.floatValue()).movie(movieOptional.get()).build());
+			score = (MovieAverageScore.builder().averageScore(avgScore).movie(movieOptional.get()).build());
 		}
 		score = movieAverageScoreRepository.save(score);
 		return score;

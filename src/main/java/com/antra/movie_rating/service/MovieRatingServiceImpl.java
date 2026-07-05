@@ -10,6 +10,7 @@ import com.antra.movie_rating.domain.MovieAverageScore;
 import com.antra.movie_rating.domain.MovieCharact;
 import com.antra.movie_rating.domain.MovieRating;
 import com.antra.movie_rating.domain.MovieScore;
+import com.antra.movie_rating.exception.RatingNotExistException;
 import com.antra.movie_rating.utility.RatingConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,6 +47,37 @@ public class MovieRatingServiceImpl implements MovieRatingService {
 		rating = ratingDAO.save(rating);
 		avgScoreDAO.updateAverage(rating.getMovie().getId());
 		return rating;
+	}
+
+	@Override
+	@Transactional
+	public MovieRating updateRating(MovieRating updated) {
+		List<MovieRating> existing = ratingDAO.findByUserIdAndMovieId(
+				updated.getUser().getId(), updated.getMovie().getId());
+		if (existing == null || existing.isEmpty()) {
+			throw new RatingNotExistException("User has not rated this movie yet");
+		}
+		MovieRating rating = existing.get(0);
+		rating.setComment(updated.getComment());
+		rating.getScores().clear();
+		for (MovieScore score : updated.getScores()) {
+			score.setRating(rating);
+			rating.getScores().add(score);
+		}
+		rating = ratingDAO.save(rating);
+		avgScoreDAO.updateAverage(rating.getMovie().getId());
+		return rating;
+	}
+
+	@Override
+	@Transactional
+	public void deleteRating(int movieId, int userId) {
+		List<MovieRating> existing = ratingDAO.findByUserIdAndMovieId(userId, movieId);
+		if (existing == null || existing.isEmpty()) {
+			throw new RatingNotExistException("User has not rated this movie");
+		}
+		ratingDAO.deleteAll(existing);
+		avgScoreDAO.updateAverage(movieId);
 	}
 
 	@Override

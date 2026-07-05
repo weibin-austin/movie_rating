@@ -8,6 +8,7 @@ import com.antra.movie_rating.config.security.UserPrincipal;
 import com.antra.movie_rating.domain.MovieCharact;
 import com.antra.movie_rating.domain.MovieRating;
 import com.antra.movie_rating.exception.MovieNotExistExeption;
+import com.antra.movie_rating.exception.RatingNotExistException;
 import com.antra.movie_rating.service.MovieRatingService;
 import com.antra.movie_rating.service.MovieService;
 import com.antra.movie_rating.utility.MovieScoreConverter;
@@ -70,6 +71,23 @@ public class MovieRatingController {
 				.build(), HttpStatus.OK);
 	}
 
+	@PutMapping
+	public ResponseEntity<Object> editRating(@RequestBody RatingVO rate, @LoginUser UserPrincipal user) {
+		log.info(rate.toString());
+		MovieRating result = ratingService.updateRating(MovieScoreConverter.convertRatingVOtoMovieRating(rate, user.getId()));
+		return new ResponseEntity<Object>(RatingResponseVO.builder().msg("Rating is updated.")
+				.movieId(result.getMovie().getId())
+				.build(), HttpStatus.OK);
+	}
+
+	@DeleteMapping
+	public ResponseEntity<Object> deleteRating(@RequestParam int movieId, @LoginUser UserPrincipal user) {
+		ratingService.deleteRating(movieId, user.getId().intValue());
+		return new ResponseEntity<Object>(RatingResponseVO.builder().msg("Rating is deleted.")
+				.movieId(movieId)
+				.build(), HttpStatus.OK);
+	}
+
 	@GetMapping("/ratingInfo")
 	public ResponseEntity<Object>  getMovieRatingInfo(@RequestParam int movieId,
 	                                                  @RequestParam int page,
@@ -92,6 +110,12 @@ public class MovieRatingController {
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public void noMovieFound(MovieNotExistExeption ex) {
+
+	}
+
+	@ExceptionHandler
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public void noRatingFound(RatingNotExistException ex) {
 
 	}
 }

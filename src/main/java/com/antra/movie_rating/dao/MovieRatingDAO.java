@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface MovieRatingDAO extends JpaRepository<MovieRating, Integer> {
-	List<MovieRating> findByUserIdAndMovieId(int movieId, int userId);
+	List<MovieRating> findByUserIdAndMovieId(int userId, int movieId);
 
 	List<MovieRating> findByCreatedDateBeforeAndMovieId(Date fromTime, int movieId, Pageable pageable);
 

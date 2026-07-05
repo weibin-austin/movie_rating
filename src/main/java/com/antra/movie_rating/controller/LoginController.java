@@ -5,6 +5,7 @@ import com.antra.movie_rating.api.request.SignUpRequest;
 import com.antra.movie_rating.api.response.JwtAuthenticationResponse;
 import com.antra.movie_rating.api.response.UserResponse;
 import com.antra.movie_rating.config.security.JwtTokenProvider;
+import com.antra.movie_rating.config.security.UserPrincipal;
 import com.antra.movie_rating.dao.UserRepository;
 import com.antra.movie_rating.dao.UserRoleRepository;
 import com.antra.movie_rating.domain.RoleName;
@@ -61,7 +62,9 @@ public class LoginController {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		String jwt = tokenProvider.generateToken(authentication);
-		return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+		return ResponseEntity.ok(new JwtAuthenticationResponse(jwt,
+				principal.getName(), principal.getUsername(), principal.getEmail()));
 	}
 
 	@PostMapping("/signup")
