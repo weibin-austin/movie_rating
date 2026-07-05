@@ -42,9 +42,10 @@ public class Movie {
 	@JsonProperty("Poster")
 	private String poster;
 	@JsonProperty("Plot")
+	@Column(length = 4000)
 	private String plot;
 
-	@OneToMany
+	@OneToMany(mappedBy = "movie")
 	@JsonIgnore
 	private List<MovieRating> rating;
 

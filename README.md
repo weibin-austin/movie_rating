@@ -28,12 +28,12 @@ After that, all API calls needs authorization header.
 
 ## To Do
 ### No UI changes
-* Implement a feature to allow user search by `IMDB` or title.(use the existing search by title field. No UI changes.)
-* Implement a feature to list all popular movies when `Popular` button is clicked on home page.(for now it is hard coded. No UI changes.)
-* Implement a feature to list all popular Action / Cartoon movies. (for now it is hard coded. No UI changes.)
-* Add cache expiration.(need to do some research. No UI changes.)
+* [x] Search by `IMDB` or title: the existing search field (`GET /movie?title=`) now detects IMDB ids (`tt0120338`) and searches by id, in the DB first and then OMDB.
+* [x] Popular movies (`GET /movie/popular?type=popular`) are no longer hard coded: they are the top movies ranked by stored average rating.
+* [x] Popular Action / Cartoon movies (`type=action` / `type=cartoon`) filter that ranking by genre (`cartoon` maps to OMDB's `Animation` genre; any other type is treated as a genre name).
+* [x] Cache expiration: caches use Caffeine with `expireAfterWrite=10m` (see `spring.cache.*` in `application.properties`).
 
-### UI changes
-* Show user's First Name + Last Name on the right upper cover. (Now it is `username-email`, minor UI changes. Need backend changes.)
-* Implement delete rating function.(need some UI change)
-* Implement edit rating(need UI change)
+### UI changes (backend part done in this repo)
+* [x] Show user's name on the upper right: `POST /api/auth/signin` now returns `name`, `username` and `email` alongside the token (the JWT also carries a `name` claim). Front-end still needs to display it.
+* [x] Delete rating: `DELETE /rating?movieId={id}` removes the logged-in user's rating for that movie and recalculates the average. Front-end needs a delete button.
+* [x] Edit rating: `PUT /rating` with the same body as the create call replaces the logged-in user's rating and recalculates the average. Front-end needs an edit flow.

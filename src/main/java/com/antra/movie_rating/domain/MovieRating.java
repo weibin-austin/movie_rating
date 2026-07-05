@@ -34,7 +34,7 @@ public class MovieRating {
 	@CreatedDate
 	private Date createdDate;
 
-	@OneToMany(mappedBy = "rating", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@OneToMany(mappedBy = "rating", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
 	private List<MovieScore> scores;
 
 	@Override

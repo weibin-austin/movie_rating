@@ -13,6 +13,10 @@ public interface MovieRatingService {
 
 	MovieRating saveRating(MovieRating rating);
 
+	MovieRating updateRating(MovieRating updated);
+
+	void deleteRating(int movieId, int userId);
+
 	Float getAverageScore(int movieId);
 
 	boolean getIfUserCanRateMovie(int movieId, int userId);
