@@ -96,6 +96,12 @@ public class MovieRatingServiceImpl implements MovieRatingService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public long getRatingTotalByUserId(int userId) {
+		return ratingDAO.countByUserId(userId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<RatingCommentResponseVO> getRatingCommentInfo(int movieId, int page, int recordNo, Date fromTime) {
 		Pageable pageCriteria = PageRequest.of(page, recordNo, Sort.by(Sort.Direction.DESC, "createdDate"));
 		List<MovieRating> ratingList = ratingDAO.findByCreatedDateBeforeAndMovieId(fromTime, movieId, pageCriteria);

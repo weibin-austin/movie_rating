@@ -17,6 +17,8 @@ public interface MovieRatingService {
 
 	void deleteRating(int movieId, int userId);
 
+	long getRatingTotalByUserId(int userId);
+
 	Float getAverageScore(int movieId);
 
 	boolean getIfUserCanRateMovie(int movieId, int userId);

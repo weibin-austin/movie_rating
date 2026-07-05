@@ -7,6 +7,7 @@ import com.antra.movie_rating.config.security.LoginUser;
 import com.antra.movie_rating.config.security.UserPrincipal;
 import com.antra.movie_rating.domain.Movie;
 import com.antra.movie_rating.exception.MovieNotExistExeption;
+import com.antra.movie_rating.service.MovieRatingService;
 import com.antra.movie_rating.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,9 @@ public class MovieController {
 
 	@Autowired
 	MovieService movieService;
+
+	@Autowired
+	MovieRatingService ratingService;
 
 	@GetMapping("/movie")
 	public MovieListResp getMovie(@RequestParam String title, @LoginUser UserPrincipal user){
@@ -73,7 +77,7 @@ public class MovieController {
 	@GetMapping("/ratingTotal")
 	public Map<String, String> getMovieDetail(@RequestParam Integer userId){
 		Map<String, String> response = new HashMap<>();
-		response.put("totalNo", String.valueOf(12));
+		response.put("totalNo", String.valueOf(ratingService.getRatingTotalByUserId(userId)));
 		response.put("userId", String.valueOf(userId));
 		return response;
 	}

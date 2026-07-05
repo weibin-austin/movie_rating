@@ -91,6 +91,32 @@ public class RatingFlowIntegrationTests {
 	}
 
 	@Test
+	public void ratingTotalReflectsUserRatings() {
+		// a fresh user has no ratings
+		assertEquals(0L, ratingService.getRatingTotalByUserId(user.getId()));
+
+		// one rating -> count 1
+		ratingService.saveRating(buildRating(4));
+		assertEquals(1L, ratingService.getRatingTotalByUserId(user.getId()));
+
+		// a rating on a second movie -> count 2
+		Movie other = movieDAO.save(Movie.builder().title("Second Movie").imdbId("tt7654399").genre("Comedy").build());
+		MovieRating secondRating = buildRating(3);
+		secondRating.setMovie(other);
+		ratingService.saveRating(secondRating);
+		assertEquals(2L, ratingService.getRatingTotalByUserId(user.getId()));
+
+		// the count is per-user: a different user still has 0
+		User otherUser = userRepository.save(new User("Other User", "other" + System.nanoTime(),
+				System.nanoTime() + "@test.com", "secret", new java.util.HashSet<>()));
+		assertEquals(0L, ratingService.getRatingTotalByUserId(otherUser.getId()));
+
+		// deleting one rating brings the count back down
+		ratingService.deleteRating(movie.getId(), user.getId());
+		assertEquals(1L, ratingService.getRatingTotalByUserId(user.getId()));
+	}
+
+	@Test
 	public void popularMoviesComeFromStoredAverages() {
 		Movie other = movieDAO.save(Movie.builder().title("Other Movie").imdbId("tt7654322").genre("Animation").build());
 		ratingService.saveRating(buildRating(3));
